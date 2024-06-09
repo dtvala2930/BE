@@ -1,5 +1,6 @@
 import { Transform } from 'class-transformer';
 import { IsOptional, Max, Min } from 'class-validator';
+import { PAGINATION } from 'src/utils/constant';
 
 export class UserListQueryDTO {
   @IsOptional()

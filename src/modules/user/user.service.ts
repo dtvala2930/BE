@@ -10,8 +10,6 @@ export class UserService {
   public getUsers(queryParams: UserListQueryDTO) {
     const { limit, page } = queryParams;
 
-    const data = this.users.slice((page - 1) * limit, limit);
-
     return new QueryDataAndMeta({
       data: data,
       total: total,
