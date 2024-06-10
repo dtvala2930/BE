@@ -1,17 +1,57 @@
 import { Injectable } from '@nestjs/common';
-import { USERS } from './users.mock';
+import { differenceWith, isEqual, range } from 'lodash';
+
 import { UserListQueryDTO } from './dto/user-list-query.dto';
 import { QueryDataAndMeta } from 'src/utils/interfaces/query-data-and-meta';
+import { PrismaService } from 'src/prisma.service';
 
 @Injectable()
 export class UserService {
-  private users = USERS;
+  constructor(private readonly prismaService: PrismaService) {}
 
-  public getUsers(queryParams: UserListQueryDTO) {
+  async getAll(queryParams: UserListQueryDTO) {
     const { limit, page } = queryParams;
 
+    const skip = page > 1 ? (page - 1) * limit : 0;
+
+    const users = await this.prismaService.user.findMany({
+      take: limit,
+      skip,
+      include: {
+        meetings: {
+          select: {
+            id: true,
+            startDay: true,
+            endDay: true,
+          },
+        },
+      },
+    });
+
+    const usersWithMeetingDaysAndFree = users.map((user) => {
+      const meetingDays = user.meetings.map(({ startDay, endDay }) => [
+        startDay,
+        endDay,
+      ]);
+
+      const allDays = range(1, user.days + 1);
+      const daysFreeFromMeetings = differenceWith(
+        allDays,
+        meetingDays,
+        isEqual,
+      );
+
+      return {
+        ...user,
+        meetingDays,
+        daysWithoutMeetings: daysFreeFromMeetings.length,
+      };
+    });
+
+    const total = await this.prismaService.user.count();
+
     return new QueryDataAndMeta({
-      data: data,
+      data: usersWithMeetingDaysAndFree,
       total: total,
       queryParams,
     });

@@ -15,24 +15,23 @@ datasource db {
 }
 
 model User {
-  id         Int      @id @default(autoincrement())
-  first_name String
-  last_name  String
+  id         Int      @id
+  firstName  String 
+  lastName   String
   email      String   @unique
   gender     String
-  ip_address String
+  ipAddress  String
   days       Int
   created_at DateTime
   meetings   Meeting[]
 }
 
 model Meeting {
-  id         Int      @id @default(autoincrement())
-  user_id    Int
-  room_id    Int
-  start_day  Int
-  end_day    Int
-  created_at DateTime @default(now())
+  id        Int      @id
+  roomId    Int
+  startDay  Int
+  endDay    Int
+  createdAt DateTime @default(now())
   user User  @relation(fields: [userId], references: [id])
   userId     Int
 }

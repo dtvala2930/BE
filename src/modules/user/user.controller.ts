@@ -1,4 +1,16 @@
-import { Controller, Get, HttpStatus, Query, Res } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  HttpException,
+  HttpStatus,
+  Logger,
+  Query,
+  Res,
+  UsePipes,
+  ValidationPipe,
+} from '@nestjs/common';
+import { Response } from 'express';
+import { assign } from 'lodash';
 
 import { UserService } from './user.service';
 import { UserListQueryDTO } from './dto/user-list-query.dto';
@@ -6,18 +18,29 @@ import { ResponseSuccessInterface } from 'src/utils/interfaces';
 
 @Controller('users')
 export class UsersController {
+  logger = new Logger(UsersController.name);
   constructor(private readonly userService: UserService) {}
 
   @Get()
+  @UsePipes(new ValidationPipe({ transform: true }))
   async getUsers(@Query() queryDTO: UserListQueryDTO, @Res() res: Response) {
-    const { data, metaData } = await this.userService.getUsers(queryDTO);
-
     const resData: ResponseSuccessInterface = {
       statusCode: HttpStatus.OK,
-      success: 'get-user-list-success',
-      data,
-      metaData,
+      success: `get-user-list-success`,
+      data: null,
     };
+
+    try {
+      const { data, metaData } = await this.userService.getAll(queryDTO);
+
+      assign(resData, {
+        data,
+        metaData,
+      });
+    } catch (error) {
+      this.logger.log(error);
+      throw new HttpException(error.message, error.status);
+    }
 
     return res.status(HttpStatus.OK).json(resData);
   }
