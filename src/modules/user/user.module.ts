@@ -1,8 +1,8 @@
 import { Module, forwardRef } from '@nestjs/common';
+
 import { UserService } from './user.service';
 import { UsersController } from './user.controller';
-import { PrismaService } from 'src/prisma.service';
-import { AppModule } from 'src/app.module';
+import { PrismaService } from '../../prisma.service';
 
 @Module({
   providers: [UserService, PrismaService],
