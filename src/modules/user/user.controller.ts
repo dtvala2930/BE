@@ -14,7 +14,8 @@ import { assign } from 'lodash';
 
 import { UserService } from './user.service';
 import { UserListQueryDTO } from './dto/user-list-query.dto';
-import { ResponseSuccessInterface } from 'src/utils/interfaces';
+
+import { ResponseSuccessInterface } from '../../utils/interfaces';
 
 @Controller('users')
 export class UsersController {
