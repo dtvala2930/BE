@@ -2,8 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { differenceWith, isEqual, range } from 'lodash';
 
 import { UserListQueryDTO } from './dto/user-list-query.dto';
-import { QueryDataAndMeta } from 'src/utils/interfaces/query-data-and-meta';
-import { PrismaService } from 'src/prisma.service';
+import { QueryDataAndMeta } from '../../utils/interfaces/query-data-and-meta';
+import { PrismaService } from '../../prisma.service';
 
 @Injectable()
 export class UserService {
