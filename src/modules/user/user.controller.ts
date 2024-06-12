@@ -12,8 +12,8 @@ import {
 import { Response } from 'express';
 import { assign } from 'lodash';
 
-import { API_PREFIX_PATH } from '@utils/constant';
-import { ResponseSuccessInterface } from '@utils/interfaces';
+import { API_PREFIX_PATH } from '../../utils/constant';
+import { ResponseSuccessInterface } from '../../utils/interfaces';
 
 import { UserService } from './user.service';
 import { UserListQueryDTO } from './dto/user-list-query.dto';

@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { differenceWith, isEqual, range } from 'lodash';
 
-import { QueryDataAndMeta } from '@utils/interfaces/query-data-and-meta';
+import { PrismaService } from '../../prisma.service';
+import { QueryDataAndMeta } from '../../utils/interfaces/query-data-and-meta';
 
 import { UserListQueryDTO } from './dto/user-list-query.dto';
-import { PrismaService } from '../../prisma.service';
 
 @Injectable()
 export class UserService {
