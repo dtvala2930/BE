@@ -1,9 +1,4 @@
-import {
-  MiddlewareConsumer,
-  Module,
-  NestModule,
-  forwardRef,
-} from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { ThrottlerModule } from '@nestjs/throttler';
@@ -33,7 +28,6 @@ import { SecureHeaderMiddleware } from './middlewares/secure-header.middleware';
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
     consumer.apply(NoXPoweredByMiddleware).forRoutes('*');
-    consumer.apply(LoggerMiddleware).forRoutes('*');
     consumer.apply(SecureHeaderMiddleware).forRoutes('*');
   }
 }
