@@ -1,5 +1,4 @@
 import { NestFactory } from '@nestjs/core';
-import * as compression from 'compression';
 import * as bodyParser from 'body-parser';
 import helmet from 'helmet';
 
@@ -41,7 +40,6 @@ async function bootstrap() {
   // Apply middleware compression
   app.use(bodyParser.json({ limit: '2048mb' }));
   app.use(bodyParser.urlencoded({ limit: '2048mb', extended: true }));
-  app.use(compression());
 
   await app.listen(3000);
 }
