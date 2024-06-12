@@ -8,15 +8,11 @@ import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { ThrottlerModule } from '@nestjs/throttler';
 
-import { UserModule } from './modules/user/user.module';
-import {
-  API_PREFIX_PATH,
-  THROTTLE_LIMIT,
-  THROTTLE_TTL,
-} from './utils/constant';
-import { NoXPoweredByMiddleware } from './middlewares/no-x-powered-by.middleware';
-import { LoggerMiddleware } from './middlewares/logger.middleware';
-import { SecureHeaderMiddleware } from './middlewares/secure-header.middleware';
+import { NoXPoweredByMiddleware } from '@middlewares/no-x-powered-by.middleware';
+import { LoggerMiddleware } from '@middlewares/logger.middleware';
+import { SecureHeaderMiddleware } from '@middlewares/secure-header.middleware';
+import { API_PREFIX_PATH, THROTTLE_LIMIT, THROTTLE_TTL } from '@utils/constant';
+import { UserModule } from '@modules/user/user.module';
 
 @Module({
   imports: [

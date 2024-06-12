@@ -12,12 +12,13 @@ import {
 import { Response } from 'express';
 import { assign } from 'lodash';
 
+import { API_PREFIX_PATH } from '@utils/constant';
+import { ResponseSuccessInterface } from '@utils/interfaces';
+
 import { UserService } from './user.service';
 import { UserListQueryDTO } from './dto/user-list-query.dto';
 
-import { ResponseSuccessInterface } from '../../utils/interfaces';
-
-@Controller('users')
+@Controller(`${API_PREFIX_PATH}/users`)
 export class UsersController {
   logger = new Logger(UsersController.name);
   constructor(private readonly userService: UserService) {}
