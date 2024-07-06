@@ -1,0 +1,7 @@
+export declare const API_PREFIX_PATH = "/ytb-sharing/api/v1";
+export declare const THROTTLE_TTL = 60;
+export declare const THROTTLE_LIMIT = 30;
+export declare const PAGINATION: {
+    LIMIT: number;
+    PAGE_DEFAULT: number;
+};

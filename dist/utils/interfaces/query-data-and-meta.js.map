@@ -1,0 +1,1 @@
+{"version":3,"file":"query-data-and-meta.js","sourceRoot":"","sources":["../../../src/utils/interfaces/query-data-and-meta.ts"],"names":[],"mappings":";;;AAEA,MAAa,gBAAgB;IAI3B,YAAY,iBAAyC;QACnD,IAAI,CAAC,IAAI,GAAG,iBAAiB,CAAC,IAAI,CAAC;QACnC,IAAI,CAAC,QAAQ,GAAG;YACd,GAAG,iBAAiB,CAAC,WAAW;YAChC,KAAK,EAAE,iBAAiB,CAAC,KAAK;SAC/B,CAAC;IACJ,CAAC;CACF;AAXD,4CAWC"}

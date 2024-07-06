@@ -3,12 +3,12 @@ import * as bodyParser from 'body-parser';
 import helmet from 'helmet';
 
 import { AppModule } from './app.module';
-import compression from 'compression';
+// import compression from 'compression';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  app.use(compression());
+  // app.use(compression());
 
   app.use(
     helmet({

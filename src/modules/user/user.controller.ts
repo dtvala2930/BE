@@ -10,13 +10,13 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import { Response } from 'express';
-import { assign } from 'lodash';
 
 import { API_PREFIX_PATH } from '../../utils/constant';
 import { ResponseSuccessInterface } from '../../utils/interfaces';
 
 import { UserService } from './user.service';
 import { UserListQueryDTO } from './dto/user-list-query.dto';
+import { assign } from 'lodash';
 
 @Controller(`${API_PREFIX_PATH}/users`)
 export class UsersController {
@@ -34,7 +34,6 @@ export class UsersController {
 
     try {
       const { data, metaData } = await this.userService.getAll(queryDTO);
-
       assign(resData, {
         data,
         metaData,
