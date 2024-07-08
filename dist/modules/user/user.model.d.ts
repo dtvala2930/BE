@@ -5,6 +5,7 @@ export declare class User implements Prisma.UserCreateInput {
     lastName: string;
     email: string;
     password: string;
+    refresh_token: string;
     createdAt: string;
     updatedAt: string;
 }

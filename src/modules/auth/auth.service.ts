@@ -1,23 +1,43 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  HttpException,
+  HttpStatus,
+  Injectable,
+} from '@nestjs/common';
 import { createCipheriv, createDecipheriv } from 'crypto';
 import { hashSync, compareSync } from 'bcryptjs';
-import { signToken, verifyToken } from '../paseto/paseto';
 import {
   CIPHER_IV,
   CIPHER_KEY,
   CIPHER_MODE,
-  JWT_EXPIRED_TIME_TOKEN,
+  JWT_EXPIRED_TIME_RESET_PASSWORD_TOKEN,
+  JWT_SECRET_KEY,
 } from '../../configs/app.config';
 import { SALT_ROUNDS } from '../../utils/constant';
+import { JwtService } from '@nestjs/jwt';
+import { UserService } from '../user/user.service';
 
 @Injectable()
 export class AuthService {
+  constructor(
+    private jwtService: JwtService,
+    private readonly userService: UserService,
+  ) {}
+
   async createTokenAndRefreshToken(accountId: number, expiredTime?: string) {
-    const token: string = await this.signPayload(
-      { id: accountId },
-      expiredTime ? expiredTime : JWT_EXPIRED_TIME_TOKEN,
+    const access_token = await this.jwtService.signAsync({ accountId });
+
+    const refresh_token = await this.jwtService.signAsync(
+      { accountId },
+      {
+        secret: JWT_SECRET_KEY,
+        expiresIn: expiredTime,
+      },
     );
-    return token;
+
+    await this.userService.updateUser(accountId, { refresh_token });
+
+    return { access_token, refresh_token };
   }
 
   encodeWithCrypto(text: string) {
@@ -52,27 +72,23 @@ export class AuthService {
     return comparePass;
   }
 
-  async signPayload(payload: any, expiredTime: string) {
-    return await signToken(payload, expiredTime);
-  }
+  // async decodeJwt(str: string): Promise<string | null> {
+  //   try {
+  //     const jwtObj: any = await verifyToken(str);
+  //     return jwtObj.id;
+  //   } catch (e) {
+  //     return null;
+  //   }
+  // }
 
-  async decodeJwt(str: string): Promise<string | null> {
-    try {
-      const jwtObj: any = await verifyToken(str);
-      return jwtObj.id;
-    } catch (e) {
-      return null;
-    }
-  }
-
-  async getTimeExpires(str: string): Promise<string | null> {
-    try {
-      const jwtObj: any = await verifyToken(str);
-      return jwtObj.exp;
-    } catch (e) {
-      return null;
-    }
-  }
+  // async getTimeExpires(str: string): Promise<string | null> {
+  //   try {
+  //     const jwtObj: any = await verifyToken(str);
+  //     return jwtObj.exp;
+  //   } catch (e) {
+  //     return null;
+  //   }
+  // }
 
   compareRefreshToken(refreshToken: string, refreshTokenHash: string) {
     const passwordHashWithCrypto = this.encodeWithCrypto(refreshToken);
@@ -83,6 +99,38 @@ export class AuthService {
 
     if (!isValidRefreshToken) {
       throw new BadRequestException('refresh-token-invalid');
+    }
+
+    return isValidRefreshToken;
+  }
+
+  async refreshToken(refresh_token: string) {
+    try {
+      const verify = await this.jwtService.verifyAsync(refresh_token, {
+        secret: JWT_SECRET_KEY,
+      });
+
+      const checkExistToken = await this.userService.getUserByField({
+        id: verify.id,
+        refresh_token,
+      });
+
+      if (checkExistToken) {
+        return this.createTokenAndRefreshToken(
+          verify.accountId,
+          JWT_EXPIRED_TIME_RESET_PASSWORD_TOKEN,
+        );
+      } else {
+        throw new HttpException(
+          'Refresh token not valid',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+    } catch (error) {
+      throw new HttpException(
+        'Refresh token is not valid',
+        HttpStatus.BAD_REQUEST,
+      );
     }
   }
 }

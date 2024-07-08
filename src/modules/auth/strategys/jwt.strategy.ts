@@ -1,17 +1,22 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy } from 'passport-jwt';
 import { LoggedInterface } from '../../../utils/interfaces/logged.interface';
 import { JWT_SECRET_KEY } from '../../../configs/app.config';
 import express from 'express';
-import { verifyToken } from '../../paseto/paseto';
+import { JwtService } from '@nestjs/jwt';
+import { UserService } from '../../user/user.service';
+import { omit } from 'lodash';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
   private user: LoggedInterface;
   logger = new Logger(JwtStrategy.name);
 
-  constructor() {
+  constructor(
+    private readonly jwtService: JwtService,
+    private readonly userService: UserService,
+  ) {
     super({
       jwtFromRequest: () => '',
       ignoreExpiration: true,
@@ -20,33 +25,31 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
   }
 
   async authenticate(req: express.Request) {
-    const token = req.headers['authorization'];
-    const payload = await verifyToken(token?.replace('Bearer ', ''));
+    const token = req.headers['authorization'].replace('Bearer ', '');
 
-    if (!payload) {
-      return this.fail('login-unauthorized', 401);
+    if (!token) {
+      throw new UnauthorizedException();
     }
 
-    const id = +payload?.id;
+    try {
+      const payload = await this.jwtService.verifyAsync(token, {
+        secret: JWT_SECRET_KEY,
+      });
 
-    const accountDB = {
-      id: 1,
-      firstName: 'Nguyen',
-      lastName: 'Tan',
-      email: 'dt.duytan1999@gmail.com',
-    };
+      const id = payload.accountId;
 
-    if (!accountDB) {
-      return this.fail('login-unauthorized', 401);
+      const accountDB = await this.userService.getUserByField({ id });
+
+      this.user = {
+        id,
+        firstName: accountDB.firstName,
+        lastName: accountDB.lastName,
+        email: accountDB.email,
+      };
+
+      return this.success(omit(this.user), {});
+    } catch {
+      throw new UnauthorizedException();
     }
-
-    this.user = {
-      id,
-      firstName: accountDB.firstName,
-      lastName: accountDB.lastName,
-      email: accountDB.email,
-    };
-
-    return this.success(this.user, {});
   }
 }

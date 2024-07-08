@@ -19,6 +19,8 @@ const constant_1 = require("../../utils/constant");
 const user_service_1 = require("./user.service");
 const user_list_query_dto_1 = require("./dto/user-list-query.dto");
 const lodash_1 = require("lodash");
+const guards_1 = require("../auth/guards");
+const passport_1 = require("@nestjs/passport");
 let UsersController = UsersController_1 = class UsersController {
     constructor(userService) {
         this.userService = userService;
@@ -55,6 +57,7 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], UsersController.prototype, "getUsers", null);
 exports.UsersController = UsersController = UsersController_1 = __decorate([
+    (0, common_1.UseGuards)((0, passport_1.AuthGuard)('jwt'), guards_1.ServiceGuard),
     (0, common_1.Controller)(`${constant_1.API_PREFIX_PATH}/users`),
     __metadata("design:paramtypes", [user_service_1.UserService])
 ], UsersController);

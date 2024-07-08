@@ -6,6 +6,7 @@ import {
   Logger,
   Query,
   Res,
+  UseGuards,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
@@ -17,7 +18,10 @@ import { ResponseSuccessInterface } from '../../utils/interfaces';
 import { UserService } from './user.service';
 import { UserListQueryDTO } from './dto/user-list-query.dto';
 import { assign } from 'lodash';
+import { ServiceGuard } from '../auth/guards';
+import { AuthGuard } from '@nestjs/passport';
 
+@UseGuards(AuthGuard('jwt'), ServiceGuard)
 @Controller(`${API_PREFIX_PATH}/users`)
 export class UsersController {
   logger = new Logger(UsersController.name);

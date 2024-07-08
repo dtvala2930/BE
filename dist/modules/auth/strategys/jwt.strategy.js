@@ -15,44 +15,48 @@ const common_1 = require("@nestjs/common");
 const passport_1 = require("@nestjs/passport");
 const passport_jwt_1 = require("passport-jwt");
 const app_config_1 = require("../../../configs/app.config");
-const paseto_1 = require("../../paseto/paseto");
+const jwt_1 = require("@nestjs/jwt");
+const user_service_1 = require("../../user/user.service");
+const lodash_1 = require("lodash");
 let JwtStrategy = JwtStrategy_1 = class JwtStrategy extends (0, passport_1.PassportStrategy)(passport_jwt_1.Strategy, 'jwt') {
-    constructor() {
+    constructor(jwtService, userService) {
         super({
             jwtFromRequest: () => '',
             ignoreExpiration: true,
             secretOrKey: app_config_1.JWT_SECRET_KEY,
         });
+        this.jwtService = jwtService;
+        this.userService = userService;
         this.logger = new common_1.Logger(JwtStrategy_1.name);
     }
     async authenticate(req) {
-        const token = req.headers['authorization'];
-        const payload = await (0, paseto_1.verifyToken)(token?.replace('Bearer ', ''));
-        if (!payload) {
-            return this.fail('login-unauthorized', 401);
+        const token = req.headers['authorization'].replace('Bearer ', '');
+        if (!token) {
+            throw new common_1.UnauthorizedException();
         }
-        const id = +payload?.id;
-        const accountDB = {
-            id: 1,
-            firstName: 'Nguyen',
-            lastName: 'Tan',
-            email: 'dt.duytan1999@gmail.com',
-        };
-        if (!accountDB) {
-            return this.fail('login-unauthorized', 401);
+        try {
+            const payload = await this.jwtService.verifyAsync(token, {
+                secret: app_config_1.JWT_SECRET_KEY,
+            });
+            const id = payload.accountId;
+            const accountDB = await this.userService.getUserByField({ id });
+            this.user = {
+                id,
+                firstName: accountDB.firstName,
+                lastName: accountDB.lastName,
+                email: accountDB.email,
+            };
+            return this.success((0, lodash_1.omit)(this.user), {});
         }
-        this.user = {
-            id,
-            firstName: accountDB.firstName,
-            lastName: accountDB.lastName,
-            email: accountDB.email,
-        };
-        return this.success(this.user, {});
+        catch {
+            throw new common_1.UnauthorizedException();
+        }
     }
 };
 exports.JwtStrategy = JwtStrategy;
 exports.JwtStrategy = JwtStrategy = JwtStrategy_1 = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [])
+    __metadata("design:paramtypes", [jwt_1.JwtService,
+        user_service_1.UserService])
 ], JwtStrategy);
 //# sourceMappingURL=jwt.strategy.js.map

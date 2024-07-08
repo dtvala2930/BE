@@ -12,13 +12,26 @@ const passport_1 = require("@nestjs/passport");
 const auth_service_1 = require("./auth.service");
 const strategys_1 = require("./strategys");
 const jwt_auth_guard_1 = require("./guards/jwt-auth.guard");
+const user_module_1 = require("../user/user.module");
+const auth_login_controller_1 = require("./controllers/auth-login.controller");
+const jwt_1 = require("@nestjs/jwt");
+const app_config_1 = require("../../configs/app.config");
+const auth_refresh_token_controller_1 = require("./controllers/auth-refresh-token.controller");
 let AuthModule = class AuthModule {
 };
 exports.AuthModule = AuthModule;
 exports.AuthModule = AuthModule = __decorate([
     (0, common_1.Module)({
-        imports: [passport_1.PassportModule],
-        controllers: [],
+        imports: [
+            passport_1.PassportModule,
+            user_module_1.UserModule,
+            jwt_1.JwtModule.register({
+                global: true,
+                secret: app_config_1.JWT_SECRET_KEY,
+                signOptions: { expiresIn: app_config_1.JWT_EXPIRED_TIME_TOKEN },
+            }),
+        ],
+        controllers: [auth_login_controller_1.AuthLoginController, auth_refresh_token_controller_1.AuthRefreshTokenController],
         providers: [auth_service_1.AuthService, strategys_1.JwtStrategy, jwt_auth_guard_1.JwtAuthGuard],
         exports: [auth_service_1.AuthService],
     })

@@ -13,6 +13,7 @@ exports.UserService = void 0;
 const common_1 = require("@nestjs/common");
 const query_data_and_meta_1 = require("../../utils/interfaces/query-data-and-meta");
 const prisma_service_1 = require("../../prisma.service");
+const client_1 = require("@prisma/client");
 let UserService = class UserService {
     constructor(prismaService) {
         this.prismaService = prismaService;
@@ -30,6 +31,34 @@ let UserService = class UserService {
             total: total,
             queryParams,
         });
+    }
+    async getUserByField({ id, email, refresh_token, }) {
+        const user = await this.prismaService.user.findFirst({
+            where: { OR: [{ id }, { email }, { refresh_token }] },
+        });
+        if (!user) {
+            throw new common_1.NotFoundException(`User not found.`);
+        }
+        return user;
+    }
+    async updateUser(id, updateData) {
+        try {
+            const updatedUser = await this.prismaService.user.update({
+                where: {
+                    id,
+                },
+                data: updateData,
+            });
+            return updatedUser;
+        }
+        catch (error) {
+            if (error instanceof client_1.Prisma.PrismaClientKnownRequestError) {
+                if (error.code === 'P2025') {
+                    throw new common_1.NotFoundException(`User with ID ${id} not found.`);
+                }
+            }
+            throw error;
+        }
     }
 };
 exports.UserService = UserService;
