@@ -14,10 +14,15 @@ const throttler_1 = require("@nestjs/throttler");
 const constant_1 = require("./utils/constant");
 const user_module_1 = require("./modules/user/user.module");
 const no_x_powered_by_middleware_1 = require("./middlewares/no-x-powered-by.middleware");
+const logger_middleware_1 = require("./middlewares/logger.middleware");
 const secure_header_middleware_1 = require("./middlewares/secure-header.middleware");
+const auth_module_1 = require("./modules/auth/auth.module");
+const core_1 = require("@nestjs/core");
+const global_exception_filter_1 = require("./filters/global-exception.filter");
 let AppModule = class AppModule {
     configure(consumer) {
         consumer.apply(no_x_powered_by_middleware_1.NoXPoweredByMiddleware).forRoutes('*');
+        consumer.apply(logger_middleware_1.LoggerMiddleware).forRoutes('*');
         consumer.apply(secure_header_middleware_1.SecureHeaderMiddleware).forRoutes('*');
     }
 };
@@ -33,6 +38,17 @@ exports.AppModule = AppModule = __decorate([
                 throttlers: [{ ttl: constant_1.THROTTLE_TTL, limit: constant_1.THROTTLE_LIMIT }],
             }),
             user_module_1.UserModule,
+            auth_module_1.AuthModule,
+        ],
+        providers: [
+            {
+                provide: core_1.APP_FILTER,
+                useClass: global_exception_filter_1.GlobalExceptionsFilter,
+            },
+            {
+                provide: core_1.APP_GUARD,
+                useClass: throttler_1.ThrottlerGuard,
+            },
         ],
     })
 ], AppModule);
