@@ -1,4 +1,4 @@
-import { Injectable, Logger, UnauthorizedException } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy } from 'passport-jwt';
 import { LoggedInterface } from '../../../utils/interfaces/logged.interface';
@@ -25,31 +25,37 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
   }
 
   async authenticate(req: express.Request) {
-    const token = req.headers['authorization'].replace('Bearer ', '');
+    const authHeader = req.headers['authorization'];
 
-    if (!token) {
-      throw new UnauthorizedException();
-    }
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      const token = authHeader.replace('Bearer ', '');
 
-    try {
-      const payload = await this.jwtService.verifyAsync(token, {
-        secret: JWT_SECRET_KEY,
-      });
+      if (!token) {
+        return this.fail('login-unauthorized', 401);
+      }
 
-      const id = payload.accountId;
+      try {
+        const payload = await this.jwtService.verifyAsync(token, {
+          secret: JWT_SECRET_KEY,
+        });
 
-      const accountDB = await this.userService.getUserByField({ id });
+        const id = payload.accountId;
 
-      this.user = {
-        id,
-        firstName: accountDB.firstName,
-        lastName: accountDB.lastName,
-        email: accountDB.email,
-      };
+        const accountDB = await this.userService.getUserByField({ id });
 
-      return this.success(omit(this.user), {});
-    } catch {
-      throw new UnauthorizedException();
+        this.user = {
+          id,
+          firstName: accountDB.firstName,
+          lastName: accountDB.lastName,
+          email: accountDB.email,
+        };
+
+        return this.success(omit(this.user), {});
+      } catch {
+        return this.fail('login-unauthorized', 401);
+      }
+    } else {
+      return this.fail('login-unauthorized', 401);
     }
   }
 }

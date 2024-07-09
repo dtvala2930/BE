@@ -17,4 +17,5 @@ export declare class AuthService {
         access_token: string;
         refresh_token: string;
     }>;
+    hanldeVerifyToken(token: string): any;
 }

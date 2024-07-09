@@ -72,24 +72,6 @@ export class AuthService {
     return comparePass;
   }
 
-  // async decodeJwt(str: string): Promise<string | null> {
-  //   try {
-  //     const jwtObj: any = await verifyToken(str);
-  //     return jwtObj.id;
-  //   } catch (e) {
-  //     return null;
-  //   }
-  // }
-
-  // async getTimeExpires(str: string): Promise<string | null> {
-  //   try {
-  //     const jwtObj: any = await verifyToken(str);
-  //     return jwtObj.exp;
-  //   } catch (e) {
-  //     return null;
-  //   }
-  // }
-
   compareRefreshToken(refreshToken: string, refreshTokenHash: string) {
     const passwordHashWithCrypto = this.encodeWithCrypto(refreshToken);
     const isValidRefreshToken = compareSync(
@@ -130,6 +112,18 @@ export class AuthService {
       throw new HttpException(
         'Refresh token is not valid',
         HttpStatus.BAD_REQUEST,
+      );
+    }
+  }
+
+  hanldeVerifyToken(token: string) {
+    try {
+      const payload = this.jwtService.verify(token);
+      return payload['accountId'];
+    } catch (error) {
+      throw new HttpException(
+        { statusCode: HttpStatus.UNAUTHORIZED },
+        HttpStatus.UNAUTHORIZED,
       );
     }
   }

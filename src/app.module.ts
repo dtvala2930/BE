@@ -15,6 +15,7 @@ import { SecureHeaderMiddleware } from './middlewares/secure-header.middleware';
 import { AuthModule } from './modules/auth/auth.module';
 import { APP_FILTER, APP_GUARD } from '@nestjs/core';
 import { GlobalExceptionsFilter } from './filters/global-exception.filter';
+import { GatewayModule } from './gateway/gateway.module';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { GlobalExceptionsFilter } from './filters/global-exception.filter';
     }),
     UserModule,
     AuthModule,
+    GatewayModule,
   ],
   providers: [
     {

@@ -89,6 +89,15 @@ let AuthService = class AuthService {
             throw new common_1.HttpException('Refresh token is not valid', common_1.HttpStatus.BAD_REQUEST);
         }
     }
+    hanldeVerifyToken(token) {
+        try {
+            const payload = this.jwtService.verify(token);
+            return payload['accountId'];
+        }
+        catch (error) {
+            throw new common_1.HttpException({ statusCode: common_1.HttpStatus.UNAUTHORIZED }, common_1.HttpStatus.UNAUTHORIZED);
+        }
+    }
 };
 exports.AuthService = AuthService;
 exports.AuthService = AuthService = __decorate([

@@ -30,26 +30,32 @@ let JwtStrategy = JwtStrategy_1 = class JwtStrategy extends (0, passport_1.Passp
         this.logger = new common_1.Logger(JwtStrategy_1.name);
     }
     async authenticate(req) {
-        const token = req.headers['authorization'].replace('Bearer ', '');
-        if (!token) {
-            throw new common_1.UnauthorizedException();
+        const authHeader = req.headers['authorization'];
+        if (authHeader && authHeader.startsWith('Bearer ')) {
+            const token = authHeader.replace('Bearer ', '');
+            if (!token) {
+                return this.fail('login-unauthorized', 401);
+            }
+            try {
+                const payload = await this.jwtService.verifyAsync(token, {
+                    secret: app_config_1.JWT_SECRET_KEY,
+                });
+                const id = payload.accountId;
+                const accountDB = await this.userService.getUserByField({ id });
+                this.user = {
+                    id,
+                    firstName: accountDB.firstName,
+                    lastName: accountDB.lastName,
+                    email: accountDB.email,
+                };
+                return this.success((0, lodash_1.omit)(this.user), {});
+            }
+            catch {
+                return this.fail('login-unauthorized', 401);
+            }
         }
-        try {
-            const payload = await this.jwtService.verifyAsync(token, {
-                secret: app_config_1.JWT_SECRET_KEY,
-            });
-            const id = payload.accountId;
-            const accountDB = await this.userService.getUserByField({ id });
-            this.user = {
-                id,
-                firstName: accountDB.firstName,
-                lastName: accountDB.lastName,
-                email: accountDB.email,
-            };
-            return this.success((0, lodash_1.omit)(this.user), {});
-        }
-        catch {
-            throw new common_1.UnauthorizedException();
+        else {
+            return this.fail('login-unauthorized', 401);
         }
     }
 };

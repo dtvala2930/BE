@@ -19,6 +19,7 @@ const secure_header_middleware_1 = require("./middlewares/secure-header.middlewa
 const auth_module_1 = require("./modules/auth/auth.module");
 const core_1 = require("@nestjs/core");
 const global_exception_filter_1 = require("./filters/global-exception.filter");
+const gateway_module_1 = require("./gateway/gateway.module");
 let AppModule = class AppModule {
     configure(consumer) {
         consumer.apply(no_x_powered_by_middleware_1.NoXPoweredByMiddleware).forRoutes('*');
@@ -39,6 +40,7 @@ exports.AppModule = AppModule = __decorate([
             }),
             user_module_1.UserModule,
             auth_module_1.AuthModule,
+            gateway_module_1.GatewayModule,
         ],
         providers: [
             {
