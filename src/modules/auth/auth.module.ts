@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { PassportModule } from '@nestjs/passport';
 import { AuthService } from './auth.service';
 import { JwtStrategy } from './strategys';
@@ -11,9 +11,11 @@ import {
   JWT_SECRET_KEY,
 } from '../../configs/app.config';
 import { AuthRefreshTokenController } from './controllers/auth-refresh-token.controller';
+import { GatewayModule } from '../../gateway/gateway.module';
 
 @Module({
   imports: [
+    forwardRef(() => GatewayModule),
     PassportModule,
     UserModule,
     JwtModule.register({

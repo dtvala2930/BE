@@ -16,26 +16,40 @@ const auth_service_1 = require("../modules/auth/auth.service");
 let Gateway = class Gateway {
     constructor(authService) {
         this.authService = authService;
+        this.socketMap = new Map();
     }
-    afterInit(socket) { }
-    handleConnection(socket) {
-        console.log(socket.id);
-        const authHeader = socket.handshake.headers.authorization;
-        if (authHeader && authHeader.split(' ')[1]) {
-            try {
-                const id = this.authService.hanldeVerifyToken(authHeader.split(' ')[1]);
-                socket.data.id = id;
+    onModuleInit() {
+        this.server.on('connection', async (socket) => {
+            const token = socket.handshake.headers.authorization?.split(' ')[1];
+            if (!token) {
+                socket.disconnect(true);
+                return;
             }
-            catch (error) {
-                socket.disconnect();
+            const payload = await this.authService.hanldeVerifyToken(token);
+            if (!payload) {
+                socket.disconnect(true);
+                return;
             }
+            this.socketMap.set(payload.accountId, {
+                ...payload,
+                socketId: socket.id,
+            });
+            socket.on('disconnect', () => {
+                this.socketMap.delete(socket.id);
+            });
+        });
+    }
+    async emitNotification(userId) {
+        const socketMeta = this.socketMap.get(userId);
+        if (socketMeta) {
+            this.server.to(socketMeta?.socketId).emit('notification', 'heheheheh');
         }
         else {
-            socket.disconnect();
+            console.log('user is not online at the moment!');
         }
     }
-    handleDisconnect(socket) {
-        console.log(socket.id, socket.data?.id);
+    async currentUsers(client) {
+        client.emit('currentUsers', Array.from(this.socketMap.values()));
     }
 };
 exports.Gateway = Gateway;
@@ -43,6 +57,12 @@ __decorate([
     (0, websockets_1.WebSocketServer)(),
     __metadata("design:type", socket_io_1.Server)
 ], Gateway.prototype, "server", void 0);
+__decorate([
+    (0, websockets_1.SubscribeMessage)('currentUsers'),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [socket_io_1.Socket]),
+    __metadata("design:returntype", Promise)
+], Gateway.prototype, "currentUsers", null);
 exports.Gateway = Gateway = __decorate([
     (0, websockets_1.WebSocketGateway)(),
     __metadata("design:paramtypes", [auth_service_1.AuthService])

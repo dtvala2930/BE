@@ -17,12 +17,14 @@ const auth_login_controller_1 = require("./controllers/auth-login.controller");
 const jwt_1 = require("@nestjs/jwt");
 const app_config_1 = require("../../configs/app.config");
 const auth_refresh_token_controller_1 = require("./controllers/auth-refresh-token.controller");
+const gateway_module_1 = require("../../gateway/gateway.module");
 let AuthModule = class AuthModule {
 };
 exports.AuthModule = AuthModule;
 exports.AuthModule = AuthModule = __decorate([
     (0, common_1.Module)({
         imports: [
+            (0, common_1.forwardRef)(() => gateway_module_1.GatewayModule),
             passport_1.PassportModule,
             user_module_1.UserModule,
             jwt_1.JwtModule.register({

@@ -15,8 +15,9 @@ let GatewayModule = class GatewayModule {
 exports.GatewayModule = GatewayModule;
 exports.GatewayModule = GatewayModule = __decorate([
     (0, common_1.Module)({
-        imports: [auth_module_1.AuthModule],
+        imports: [(0, common_1.forwardRef)(() => auth_module_1.AuthModule)],
         providers: [gateway_1.Gateway],
+        exports: [gateway_1.Gateway],
     })
 ], GatewayModule);
 //# sourceMappingURL=gateway.module.js.map
