@@ -34,6 +34,7 @@ export class Gateway implements OnModuleInit {
       }
 
       const payload = await this.authService.hanldeVerifyToken(token);
+
       if (!payload) {
         socket.disconnect(true);
         return;

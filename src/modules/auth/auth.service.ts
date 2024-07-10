@@ -119,7 +119,7 @@ export class AuthService {
   hanldeVerifyToken(token: string) {
     try {
       const payload = this.jwtService.verify(token);
-      return payload['accountId'];
+      return payload;
     } catch (error) {
       throw new HttpException(
         { statusCode: HttpStatus.UNAUTHORIZED },

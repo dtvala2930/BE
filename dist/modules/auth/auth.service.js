@@ -92,7 +92,7 @@ let AuthService = class AuthService {
     hanldeVerifyToken(token) {
         try {
             const payload = this.jwtService.verify(token);
-            return payload['accountId'];
+            return payload;
         }
         catch (error) {
             throw new common_1.HttpException({ statusCode: common_1.HttpStatus.UNAUTHORIZED }, common_1.HttpStatus.UNAUTHORIZED);
