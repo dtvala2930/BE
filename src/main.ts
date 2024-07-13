@@ -4,6 +4,7 @@ import helmet from 'helmet';
 
 import { AppModule } from './app.module';
 import * as compression from 'compression';
+import { CLIENT_URL, PORT } from './configs/app.config';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
@@ -40,11 +41,15 @@ async function bootstrap() {
     }),
   );
 
+  app.enableCors({
+    origin: [CLIENT_URL, /^https\:\/\/.+\.xymax\.co\.jp$/],
+  });
+
   app.use(compression());
 
   app.use(bodyParser.json({ limit: '2048mb' }));
   app.use(bodyParser.urlencoded({ limit: '2048mb', extended: true }));
 
-  await app.listen(3000);
+  await app.listen(PORT);
 }
 bootstrap();

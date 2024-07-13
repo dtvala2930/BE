@@ -45,12 +45,10 @@ let AuthLoginController = AuthLoginController_1 = class AuthLoginController {
             if (!checkPassword) {
                 throw new common_1.HttpException('login-unauthorized', common_1.HttpStatus.UNAUTHORIZED);
             }
-            const { access_token, refresh_token } = await this.authService.createTokenAndRefreshToken(accountDB.id, app_config_1.JWT_EXPIRED_TIME_RESET_PASSWORD_TOKEN);
+            const { access_token: token } = await this.authService.createTokenAndRefreshToken(accountDB.id, app_config_1.JWT_EXPIRED_TIME_RESET_PASSWORD_TOKEN);
+            const { exp: expires } = await this.authService.hanldeVerifyToken(token);
             (0, lodash_1.assign)(resData, {
-                data: {
-                    access_token,
-                    refresh_token,
-                },
+                data: { token, expires },
             });
         }
         catch (error) {

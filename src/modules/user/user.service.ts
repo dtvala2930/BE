@@ -1,4 +1,9 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 
 import { QueryDataAndMeta } from '../../utils/interfaces/query-data-and-meta';
 
@@ -43,7 +48,7 @@ export class UserService {
     });
 
     if (!user) {
-      throw new NotFoundException(`User not found.`);
+      throw new HttpException(`User not found.`, HttpStatus.UNAUTHORIZED);
     }
 
     return user;

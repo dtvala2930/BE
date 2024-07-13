@@ -1,4 +1,6 @@
 import 'dotenv/config';
+export declare const PORT: string;
+export declare const CLIENT_URL: string;
 export declare const CIPHER_MODE: string;
 export declare const CIPHER_KEY: string;
 export declare const CIPHER_IV: string;

@@ -23,7 +23,7 @@ let AuthService = class AuthService {
         this.userService = userService;
     }
     async createTokenAndRefreshToken(accountId, expiredTime) {
-        const access_token = await this.jwtService.signAsync({ accountId });
+        const access_token = await this.jwtService.signAsync({ accountId }, { expiresIn: app_config_1.JWT_EXPIRED_TIME_TOKEN });
         const refresh_token = await this.jwtService.signAsync({ accountId }, {
             secret: app_config_1.JWT_SECRET_KEY,
             expiresIn: expiredTime,

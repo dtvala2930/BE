@@ -1,4 +1,4 @@
-export const API_PREFIX_PATH = '/ytb-sharing/api/v1';
+export const API_PREFIX_PATH = '/interview/api/v1';
 
 export const THROTTLE_TTL = 60;
 export const THROTTLE_LIMIT = 30;

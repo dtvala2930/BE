@@ -1,5 +1,8 @@
 import 'dotenv/config';
 
+export const PORT = process.env.PORT;
+export const CLIENT_URL = process.env.CLIENT_URL;
+
 // CRYPTO
 export const CIPHER_MODE = process.env.CIPHER_MODE;
 export const CIPHER_KEY = process.env.CIPHER_KEY;

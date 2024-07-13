@@ -12,6 +12,7 @@ import {
 } from '../../configs/app.config';
 import { AuthRefreshTokenController } from './controllers/auth-refresh-token.controller';
 import { GatewayModule } from '../../gateway/gateway.module';
+import { AuthProfileController } from './controllers/auth-profile.controller';
 
 @Module({
   imports: [
@@ -24,7 +25,11 @@ import { GatewayModule } from '../../gateway/gateway.module';
       signOptions: { expiresIn: JWT_EXPIRED_TIME_TOKEN },
     }),
   ],
-  controllers: [AuthLoginController, AuthRefreshTokenController],
+  controllers: [
+    AuthLoginController,
+    AuthRefreshTokenController,
+    AuthProfileController,
+  ],
   providers: [AuthService, JwtStrategy, JwtAuthGuard],
   exports: [AuthService],
 })

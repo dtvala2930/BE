@@ -37,7 +37,7 @@ let UserService = class UserService {
             where: { OR: [{ id }, { email }, { refresh_token }] },
         });
         if (!user) {
-            throw new common_1.NotFoundException(`User not found.`);
+            throw new common_1.HttpException(`User not found.`, common_1.HttpStatus.UNAUTHORIZED);
         }
         return user;
     }

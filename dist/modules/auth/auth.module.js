@@ -18,6 +18,7 @@ const jwt_1 = require("@nestjs/jwt");
 const app_config_1 = require("../../configs/app.config");
 const auth_refresh_token_controller_1 = require("./controllers/auth-refresh-token.controller");
 const gateway_module_1 = require("../../gateway/gateway.module");
+const auth_profile_controller_1 = require("./controllers/auth-profile.controller");
 let AuthModule = class AuthModule {
 };
 exports.AuthModule = AuthModule;
@@ -33,7 +34,11 @@ exports.AuthModule = AuthModule = __decorate([
                 signOptions: { expiresIn: app_config_1.JWT_EXPIRED_TIME_TOKEN },
             }),
         ],
-        controllers: [auth_login_controller_1.AuthLoginController, auth_refresh_token_controller_1.AuthRefreshTokenController],
+        controllers: [
+            auth_login_controller_1.AuthLoginController,
+            auth_refresh_token_controller_1.AuthRefreshTokenController,
+            auth_profile_controller_1.AuthProfileController,
+        ],
         providers: [auth_service_1.AuthService, strategys_1.JwtStrategy, jwt_auth_guard_1.JwtAuthGuard],
         exports: [auth_service_1.AuthService],
     })

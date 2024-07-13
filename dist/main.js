@@ -5,6 +5,7 @@ const bodyParser = require("body-parser");
 const helmet_1 = require("helmet");
 const app_module_1 = require("./app.module");
 const compression = require("compression");
+const app_config_1 = require("./configs/app.config");
 async function bootstrap() {
     const app = await core_1.NestFactory.create(app_module_1.AppModule, {
         logger: ['error', 'warn', 'log'],
@@ -36,10 +37,13 @@ async function bootstrap() {
             },
         },
     }));
+    app.enableCors({
+        origin: [app_config_1.CLIENT_URL, /^https\:\/\/.+\.xymax\.co\.jp$/],
+    });
     app.use(compression());
     app.use(bodyParser.json({ limit: '2048mb' }));
     app.use(bodyParser.urlencoded({ limit: '2048mb', extended: true }));
-    await app.listen(3000);
+    await app.listen(app_config_1.PORT);
 }
 bootstrap();
 //# sourceMappingURL=main.js.map

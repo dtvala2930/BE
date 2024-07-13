@@ -11,6 +11,7 @@ import {
   CIPHER_KEY,
   CIPHER_MODE,
   JWT_EXPIRED_TIME_RESET_PASSWORD_TOKEN,
+  JWT_EXPIRED_TIME_TOKEN,
   JWT_SECRET_KEY,
 } from '../../configs/app.config';
 import { SALT_ROUNDS } from '../../utils/constant';
@@ -25,7 +26,10 @@ export class AuthService {
   ) {}
 
   async createTokenAndRefreshToken(accountId: number, expiredTime?: string) {
-    const access_token = await this.jwtService.signAsync({ accountId });
+    const access_token = await this.jwtService.signAsync(
+      { accountId },
+      { expiresIn: JWT_EXPIRED_TIME_TOKEN },
+    );
 
     const refresh_token = await this.jwtService.signAsync(
       { accountId },

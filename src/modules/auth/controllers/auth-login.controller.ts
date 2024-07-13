@@ -53,19 +53,16 @@ export class AuthLoginController {
         throw new HttpException('login-unauthorized', HttpStatus.UNAUTHORIZED);
       }
 
-      const { access_token, refresh_token } =
+      const { access_token: token } =
         await this.authService.createTokenAndRefreshToken(
           accountDB.id,
           JWT_EXPIRED_TIME_RESET_PASSWORD_TOKEN,
         );
 
-      //   const expires = await this.authService.getTimeExpires(refresh_token);
+      const { exp: expires } = await this.authService.hanldeVerifyToken(token);
 
       assign(resData, {
-        data: {
-          access_token,
-          refresh_token,
-        },
+        data: { token, expires },
       });
     } catch (error) {
       this.logger.error(JSON.stringify(error, null, 4));
