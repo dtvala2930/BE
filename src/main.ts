@@ -42,7 +42,7 @@ async function bootstrap() {
   );
 
   app.enableCors({
-    origin: [CLIENT_URL, /^https\:\/\/.+\.xymax\.co\.jp$/],
+    origin: [CLIENT_URL, /^https:\/\/interview-3d75e\.web\.app\/?$/],
   });
 
   app.use(compression());

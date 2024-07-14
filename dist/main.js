@@ -38,7 +38,7 @@ async function bootstrap() {
         },
     }));
     app.enableCors({
-        origin: [app_config_1.CLIENT_URL, /^https\:\/\/.+\.xymax\.co\.jp$/],
+        origin: [app_config_1.CLIENT_URL, /^https:\/\/interview-3d75e\.web\.app\/?$/],
     });
     app.use(compression());
     app.use(bodyParser.json({ limit: '2048mb' }));
