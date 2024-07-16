@@ -73,9 +73,10 @@ export class SearchController {
       split(Buffer.from(payload.fileBase64, 'base64').toString(), /\r?\n/),
     ).slice(1);
 
-    const { linkCount, total } = await this.searchService.getDataFromScraping();
+    const { linkCount, total, adwordsCount } =
+      await this.searchService.getDataFromScraping('quần');
 
-    console.log(linkCount, total);
+    console.log(linkCount, total, adwordsCount);
 
     const resData: ResponseSuccessInterface = {
       statusCode: HttpStatus.OK,
