@@ -15,7 +15,6 @@ import { SecureHeaderMiddleware } from './middlewares/secure-header.middleware';
 import { AuthModule } from './modules/auth/auth.module';
 import { APP_FILTER, APP_GUARD } from '@nestjs/core';
 import { GlobalExceptionsFilter } from './filters/global-exception.filter';
-import { GatewayModule } from './gateway/gateway.module';
 import { SearchModule } from './modules/search/search.module';
 
 @Module({
@@ -30,7 +29,6 @@ import { SearchModule } from './modules/search/search.module';
     UserModule,
     AuthModule,
     SearchModule,
-    GatewayModule,
   ],
   providers: [
     {
