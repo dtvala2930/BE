@@ -15,3 +15,6 @@ export const JWT_EXPIRED_TIME_RESET_PASSWORD_TOKEN =
 export const JWT_EXPIRED_TIME_TOKEN = process.env.JWT_EXPIRED_TIME_TOKEN;
 export const PASETO_PRIVATE_KEY = process.env.PASETO_PRIVATE_KEY;
 export const PASETO_PUBLIC_KEY = process.env.PASETO_PUBLIC_KEY;
+
+//brightdata
+export const SBR_WS_ENDPOINT = process.env.SBR_WS_ENDPOINT;
