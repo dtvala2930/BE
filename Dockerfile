@@ -11,3 +11,8 @@ EXPOSE 5000
 #yarn run start:dev
 CMD ["yarn", "run", "start:dev"]
 
+
+
+
+
+

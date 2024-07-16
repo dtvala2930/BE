@@ -18,3 +18,7 @@ export const PASETO_PUBLIC_KEY = process.env.PASETO_PUBLIC_KEY;
 
 //brightdata
 export const SBR_WS_ENDPOINT = process.env.SBR_WS_ENDPOINT;
+
+export const PUPPETEER_EXECUTABLE_PATH = process.env.PUPPETEER_EXECUTABLE_PATH;
+
+export const NODE_ENV = process.env.NODE_ENV;

@@ -9,3 +9,11 @@ services:
       - .env
     volumes:
       - ./src:/app/src
+
+  puppeteer:
+    build:
+      context: .
+      dockerfile: Dockerfile.puppeteer
+    environment:
+      - PUPPETEER_SKIP_DOWNLOAD=true
+      - PUPPETEER_EXECUTABLE_PATH=/usr/bin/google-chrome-stable
