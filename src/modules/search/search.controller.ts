@@ -26,8 +26,6 @@ import { AuthGuard } from '@nestjs/passport';
 import { SearchService } from './search.service';
 import { RequestHasUserDTO } from '../../utils/request-has-user.dto';
 import { UploadFileDto } from './dto/search.dto';
-import { SBR_WS_ENDPOINT } from '../../configs/app.config';
-import puppeteer from 'puppeteer';
 
 @UseGuards(AuthGuard('jwt'), ServiceGuard)
 @Controller(`${API_PREFIX_PATH}/search`)
