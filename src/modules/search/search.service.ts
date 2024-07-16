@@ -1,21 +1,12 @@
 import { Injectable } from '@nestjs/common';
-import puppeteer from 'puppeteer';
-import { NODE_ENV, PUPPETEER_EXECUTABLE_PATH } from '../../configs/app.config';
+import { SBR_WS_ENDPOINT } from '../../configs/app.config';
+import puppeteer from 'puppeteer-core';
 
 @Injectable()
 export class SearchService {
   async getDataFromScraping() {
-    const browser = await puppeteer.launch({
-      headless: 'shell',
-      executablePath: NODE_ENV
-        ? PUPPETEER_EXECUTABLE_PATH
-        : puppeteer.executablePath(),
-      args: [
-        '--disable-setuid-sandbox',
-        '--no-sandbox',
-        '--single-process',
-        '--no-zygote',
-      ],
+    const browser = await puppeteer.connect({
+      browserWSEndpoint: SBR_WS_ENDPOINT,
     });
 
     const page = await browser.newPage();
