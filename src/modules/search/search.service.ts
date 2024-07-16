@@ -6,7 +6,7 @@ import { NODE_ENV, PUPPETEER_EXECUTABLE_PATH } from '../../configs/app.config';
 export class SearchService {
   async getDataFromScraping() {
     const browser = await puppeteer.launch({
-      headless: false,
+      headless: 'shell',
       executablePath: NODE_ENV
         ? PUPPETEER_EXECUTABLE_PATH
         : puppeteer.executablePath(),
