@@ -15,34 +15,32 @@ datasource db {
 }
 
 model User {
-  id          Int      @id @default(autoincrement())
+  id          Int       @id @default(autoincrement())
   firstName   String 
   lastName    String
-  email       String   @unique
+  email       String    @unique
   password    String   
   refresh_token String? 
-  ytbLinks  YtbLink[]
-  notifications Notification[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  searches    Search[]
 }
 
-model YtbLink {
+model Search {
   id          Int      @id @default(autoincrement())
-  user        User @relation(fields: [userId], references: [id])
-  userId      Int
-  link        String
-  notification Notification?
+  fileName    String  
+  fileId      String   @unique
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
 }
 
-model Notification {
-  id          Int @id @default(autoincrement())
-  user        User @relation(fields: [from], references: [id])
-  from        Int
-  link        YtbLink @relation(fields: [linkId], references: [id])
-  linkId      Int @unique
+model SearchDetail {
+  id          Int   @id @default(autoincrement())
+  fileId      String 
+  result      String
+  userId      Int
 }
 
 

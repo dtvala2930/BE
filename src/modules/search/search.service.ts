@@ -1,24 +1,26 @@
-import { Injectable } from '@nestjs/common';
-// import { SBR_WS_ENDPOINT } from '../../configs/app.config';
-import puppeteer from 'puppeteer';
-// import puppeteer from 'puppeteer-core';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { SBR_WS_ENDPOINT } from '../../configs/app.config';
+// import puppeteer from 'puppeteer';
+import { PrismaService } from '../../prisma.service';
+import puppeteer from 'puppeteer-core';
 
 @Injectable()
 export class SearchService {
-  async getDataFromScraping(searchKeyword: string) {
-    // const browser = await puppeteer.connect({
-    //   browserWSEndpoint: SBR_WS_ENDPOINT,
-    // });
+  constructor(private readonly prismaService: PrismaService) {}
 
-    const browser = await puppeteer.launch({
-      headless: false,
+  async getDataFromScraping(searchKeyword: string) {
+    const browser = await puppeteer.connect({
+      browserWSEndpoint: SBR_WS_ENDPOINT,
     });
+
+    // const browser = await puppeteer.launch({
+    //   headless: false,
+    // });
 
     const page = await browser.newPage();
     await page.goto(`https://www.google.com/search?q=${searchKeyword}`);
 
     const pageHTML = await page.content();
-    console.log(pageHTML);
 
     const linkCount = await page.$$eval('a[href]', (links) => links.length);
 
@@ -39,6 +41,30 @@ export class SearchService {
 
     await browser.close();
 
-    return { linkCount, total, adwordsCount };
+    return {
+      pageHTML,
+      searchKeyword,
+      linkCount: linkCount.toString(),
+      total,
+      adwordsCount: adwordsCount.toString(),
+    };
+  }
+
+  async getAllSearchByUserLoggedIn(userId: number) {
+    const searchData = await this.prismaService.search.findMany({
+      where: { userId },
+      select: {
+        fileName: true,
+      },
+    });
+
+    if (!searchData) {
+      throw new HttpException(
+        `Can not scrape data`,
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+
+    return searchData;
   }
 }

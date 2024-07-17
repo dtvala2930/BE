@@ -3,9 +3,5 @@ export class UploadFileDto {
 
   fileName: string;
 
-  fileSize: number;
-
   id: string;
-
-  type: string;
 }
