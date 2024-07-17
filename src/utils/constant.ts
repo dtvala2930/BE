@@ -9,3 +9,5 @@ export const PAGINATION = {
   LIMIT: 10,
   PAGE_DEFAULT: 1,
 };
+
+export const TIMEZONE = 'Asia/Tokyo';

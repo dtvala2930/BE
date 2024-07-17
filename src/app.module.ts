@@ -2,6 +2,7 @@ import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import { APP_FILTER, APP_GUARD } from '@nestjs/core';
 
 import {
   API_PREFIX_PATH,
@@ -13,10 +14,9 @@ import { NoXPoweredByMiddleware } from './middlewares/no-x-powered-by.middleware
 import { LoggerMiddleware } from './middlewares/logger.middleware';
 import { SecureHeaderMiddleware } from './middlewares/secure-header.middleware';
 import { AuthModule } from './modules/auth/auth.module';
-import { APP_FILTER, APP_GUARD } from '@nestjs/core';
 import { GlobalExceptionsFilter } from './filters/global-exception.filter';
-import { GatewayModule } from './gateway/gateway.module';
 import { SearchModule } from './modules/search/search.module';
+import { SearchDetailModule } from './modules/searchDetail/searchDetail.module';
 
 @Module({
   imports: [
@@ -30,7 +30,7 @@ import { SearchModule } from './modules/search/search.module';
     UserModule,
     AuthModule,
     SearchModule,
-    GatewayModule,
+    SearchDetailModule,
   ],
   providers: [
     {

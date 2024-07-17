@@ -1,16 +1,26 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { SBR_WS_ENDPOINT } from '../../configs/app.config';
+// import puppeteer from 'puppeteer';
+import { PrismaService } from '../../prisma.service';
 import puppeteer from 'puppeteer-core';
 
 @Injectable()
 export class SearchService {
-  async getDataFromScraping() {
+  constructor(private readonly prismaService: PrismaService) {}
+
+  async getDataFromScraping(searchKeyword: string) {
     const browser = await puppeteer.connect({
       browserWSEndpoint: SBR_WS_ENDPOINT,
     });
 
+    // const browser = await puppeteer.launch({
+    //   headless: false,
+    // });
+
     const page = await browser.newPage();
-    await page.goto('https://www.google.com/search?q=youtube');
+    await page.goto(`https://www.google.com/search?q=${searchKeyword}`);
+
+    const pageHTML = await page.content();
 
     const linkCount = await page.$$eval('a[href]', (links) => links.length);
 
@@ -18,8 +28,43 @@ export class SearchService {
       return anchor.textContent;
     });
 
+    let adwordsCount = 0;
+    const adwordsElement =
+      (await page.$('div.pla-unit')) || (await page.$('div.mnr-c')) || null;
+    if (adwordsElement) {
+      adwordsCount = await page.$$eval('div.pla-unit', (anchor) => {
+        return anchor.length;
+      });
+    } else {
+      adwordsCount = 0;
+    }
+
     await browser.close();
 
-    return { linkCount, total };
+    return {
+      pageHTML,
+      searchKeyword,
+      linkCount: linkCount.toString(),
+      total,
+      adwordsCount: adwordsCount.toString(),
+    };
+  }
+
+  async getAllSearchByUserLoggedIn(userId: number) {
+    const searchData = await this.prismaService.search.findMany({
+      where: { userId },
+      select: {
+        fileName: true,
+      },
+    });
+
+    if (!searchData) {
+      throw new HttpException(
+        `Can not scrape data`,
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+
+    return searchData;
   }
 }
