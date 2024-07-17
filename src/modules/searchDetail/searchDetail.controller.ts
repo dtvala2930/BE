@@ -50,7 +50,7 @@ export class SearchDetailController {
         fileId,
       );
       assign(resData, {
-        searchData,
+        data: searchData,
       });
     } catch (error) {
       this.logger.log(error);

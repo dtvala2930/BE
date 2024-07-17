@@ -79,10 +79,15 @@ export class SearchController {
 
     const resultsScrapped = [];
 
-    for (const item of data) {
-      const scrappedData = await this.searchService.getDataFromScraping(item);
-      resultsScrapped.push(scrappedData);
-    }
+    const scrappingPromises = data.map((item) =>
+      this.searchService.getDataFromScraping(item),
+    );
+
+    const scrappedData = await Promise.all(scrappingPromises);
+
+    scrappedData.forEach((item) => {
+      resultsScrapped.push(item);
+    });
 
     const payloadAddSearch: IAddSearchPayload = {
       createdAt: dateNowTimeZone,
@@ -99,13 +104,13 @@ export class SearchController {
     };
 
     try {
-      //insert Table Search
       await this.prismaService.$transaction(async (tx) => {
+        //insert Table Search
         await tx.search.create({
           data: payloadAddSearch,
         });
 
-        //insert Table SearchDetail
+        // insert Table SearchDetail
         await tx.searchDetail.create({
           data: payloadAddSearchDetail,
         });

@@ -1,26 +1,32 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { SBR_WS_ENDPOINT } from '../../configs/app.config';
-// import puppeteer from 'puppeteer';
+// import { SBR_WS_ENDPOINT } from '../../configs/app.config';
+import puppeteer from 'puppeteer';
 import { PrismaService } from '../../prisma.service';
-import puppeteer from 'puppeteer-core';
+// import puppeteer from 'puppeteer-core';
 
 @Injectable()
 export class SearchService {
   constructor(private readonly prismaService: PrismaService) {}
 
   async getDataFromScraping(searchKeyword: string) {
-    const browser = await puppeteer.connect({
-      browserWSEndpoint: SBR_WS_ENDPOINT,
-    });
-
-    // const browser = await puppeteer.launch({
-    //   headless: false,
+    // const browser = await puppeteer.connect({
+    //   browserWSEndpoint: SBR_WS_ENDPOINT,
     // });
+
+    const browser = await puppeteer.launch({
+      headless: false,
+    });
 
     const page = await browser.newPage();
     await page.goto(`https://www.google.com/search?q=${searchKeyword}`);
 
     const pageHTML = await page.content();
+
+    const chunkSize = 50000;
+    const chunks = [];
+    for (let i = 0; i < pageHTML.length; i += chunkSize) {
+      chunks.push(pageHTML.substring(i, i + chunkSize));
+    }
 
     const linkCount = await page.$$eval('a[href]', (links) => links.length);
 
@@ -42,7 +48,7 @@ export class SearchService {
     await browser.close();
 
     return {
-      pageHTML,
+      pageHTML: chunks,
       searchKeyword,
       linkCount: linkCount.toString(),
       total,
