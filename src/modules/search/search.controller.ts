@@ -54,7 +54,7 @@ export class SearchController {
         userCurrent.id,
       );
       assign(resData, {
-        searchData,
+        data: searchData,
       });
     } catch (error) {
       this.logger.log(error);

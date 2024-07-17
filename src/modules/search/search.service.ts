@@ -55,6 +55,7 @@ export class SearchService {
       where: { userId },
       select: {
         fileName: true,
+        fileId: true,
       },
     });
 
