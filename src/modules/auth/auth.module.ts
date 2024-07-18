@@ -12,6 +12,8 @@ import {
 } from '../../configs/app.config';
 import { AuthRefreshTokenController } from './controllers/auth-refresh-token.controller';
 import { AuthProfileController } from './controllers/auth-profile.controller';
+import { AuthRegisterController } from './controllers/auth-register.controller';
+import { PrismaService } from '../../prisma.service';
 
 @Module({
   imports: [
@@ -27,8 +29,9 @@ import { AuthProfileController } from './controllers/auth-profile.controller';
     AuthLoginController,
     AuthRefreshTokenController,
     AuthProfileController,
+    AuthRegisterController,
   ],
-  providers: [AuthService, JwtStrategy, JwtAuthGuard],
+  providers: [AuthService, JwtStrategy, JwtAuthGuard, PrismaService],
   exports: [AuthService],
 })
 export class AuthModule {}

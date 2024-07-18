@@ -1,9 +1,4 @@
-import {
-  HttpException,
-  HttpStatus,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 
 import { QueryDataAndMeta } from '../../utils/interfaces/query-data-and-meta';
 
@@ -46,10 +41,6 @@ export class UserService {
     const user = await this.prismaService.user.findFirst({
       where: { OR: [{ id }, { email }, { refresh_token }] },
     });
-
-    if (!user) {
-      throw new HttpException(`User not found.`, HttpStatus.UNAUTHORIZED);
-    }
 
     return user;
   }
