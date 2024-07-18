@@ -11,3 +11,8 @@ export const PAGINATION = {
 };
 
 export const TIMEZONE = 'Asia/Tokyo';
+
+export const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+export const PASSWORD_VALID_REGEX =
+  /^(?=.*[A-Z])(?=.*[!@#$%^&*(),.?":{}|<>])(?=.*\d)(.{8,})$/;
