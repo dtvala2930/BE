@@ -70,63 +70,63 @@ export class SearchController {
     @Req() req: RequestHasUserDTO & Request,
     @Body() payload: UploadFileDto,
   ) {
-    const dateNowTimeZone = new Date();
-    const { user: userCurrent } = req;
-
-    const data = compact(
-      split(Buffer.from(payload.fileBase64, 'base64').toString(), /\r?\n/),
-    );
-
-    const resultsScrapped = [];
-
-    const scrappingPromises = data.map((item) =>
-      this.searchService.getDataFromScraping(item),
-    );
-
-    const scrappedData = await Promise.all(scrappingPromises);
-
-    scrappedData.forEach((item) => {
-      resultsScrapped.push(item);
-    });
-
-    const payloadAddSearch: IAddSearchPayload = {
-      createdAt: dateNowTimeZone,
-      updatedAt: dateNowTimeZone,
-      userId: userCurrent.id,
-      fileId: payload.id,
-      ...omit(payload, ['id', 'fileBase64']),
-    };
-
-    const payloadAddSearchDetail: IAddSearchDetailPayload = {
-      userId: userCurrent.id,
-      fileId: payload.id,
-      result: JSON.stringify(resultsScrapped),
-    };
-
-    try {
-      await this.prismaService.$transaction(async (tx) => {
-        //insert Table Search
-        await tx.search.create({
-          data: payloadAddSearch,
-        });
-
-        // insert Table SearchDetail
-        await tx.searchDetail.create({
-          data: payloadAddSearchDetail,
-        });
-      });
-    } catch (error) {
-      return new HttpException(
-        'Fail to insert Search',
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
-    }
-
     const resData: ResponseSuccessInterface = {
       statusCode: HttpStatus.OK,
       success: 'search-upload-file-success',
-      data: data,
+      data: null,
     };
+
+    const dateNowTimeZone = new Date();
+    const { user: userCurrent } = req;
+
+    const dataFromUploadedFile = this.searchService.getDataFromFile(
+      payload.fileBase64,
+    );
+
+    console.log(dataFromUploadedFile);
+
+    // const scrappingPromises = dataFromUploadedFile.map((item) =>
+    //   this.searchService.getDataFromScraping(item),
+    // );
+
+    // const scrappedData = await Promise.all(scrappingPromises);
+
+    // scrappedData.forEach((item) => {
+    //   resultsScrapped.push(item);
+    // });
+
+    // const payloadAddSearch: IAddSearchPayload = {
+    //   createdAt: dateNowTimeZone,
+    //   updatedAt: dateNowTimeZone,
+    //   userId: userCurrent.id,
+    //   fileId: payload.id,
+    //   ...omit(payload, ['id', 'fileBase64']),
+    // };
+
+    // const payloadAddSearchDetail: IAddSearchDetailPayload = {
+    //   userId: userCurrent.id,
+    //   fileId: payload.id,
+    //   result: JSON.stringify(resultsScrapped),
+    // };
+
+    // try {
+    //   await this.prismaService.$transaction(async (tx) => {
+    //     //insert Table Search
+    //     await tx.search.create({
+    //       data: payloadAddSearch,
+    //     });
+
+    //     // insert Table SearchDetail
+    //     await tx.searchDetail.create({
+    //       data: payloadAddSearchDetail,
+    //     });
+    //   });
+    // } catch (error) {
+    //   return new HttpException(
+    //     'Fail to insert Search',
+    //     HttpStatus.INTERNAL_SERVER_ERROR,
+    //   );
+    // }
 
     return res.status(HttpStatus.OK).json(resData);
   }

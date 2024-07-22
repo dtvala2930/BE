@@ -1,21 +1,44 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { SBR_WS_ENDPOINT } from '../../configs/app.config';
-// import puppeteer from 'puppeteer';
+// import { SBR_WS_ENDPOINT } from '../../configs/app.config';
+import puppeteer from 'puppeteer';
 import { PrismaService } from '../../prisma.service';
-import puppeteer from 'puppeteer-core';
+import { compact, split } from 'lodash';
+// import puppeteer from 'puppeteer-core';
 
 @Injectable()
 export class SearchService {
   constructor(private readonly prismaService: PrismaService) {}
 
-  async getDataFromScraping(searchKeyword: string) {
-    const browser = await puppeteer.connect({
-      browserWSEndpoint: SBR_WS_ENDPOINT,
-    });
+  getDataFromFile(fileBase64: string) {
+    const data = compact(
+      split(Buffer.from(fileBase64, 'base64').toString(), /\r?\n|\n/),
+    );
 
-    // const browser = await puppeteer.launch({
-    //   headless: false,
+    const dataFile =
+      data.length === 1 && data[0].includes(',')
+        ? data[0].split(',').map((item) => item.trim())
+        : data;
+
+    if (dataFile.length === 0 || dataFile.length > 100) {
+      throw new HttpException(
+        dataFile.length === 0
+          ? 'The data file is empty. It must contain between 1 and 100 rows.'
+          : 'The data file must contain no more than 100 rows.',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    return dataFile;
+  }
+
+  async getDataFromScraping(searchKeyword: string) {
+    // const browser = await puppeteer.connect({
+    //   browserWSEndpoint: SBR_WS_ENDPOINT,
     // });
+
+    const browser = await puppeteer.launch({
+      headless: false,
+    });
 
     const page = await browser.newPage();
     await page.goto(`https://www.google.com/search?q=${searchKeyword}`);
@@ -67,7 +90,7 @@ export class SearchService {
 
     if (!searchData) {
       throw new HttpException(
-        `Can not scrape data`,
+        `Can not get all search`,
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
