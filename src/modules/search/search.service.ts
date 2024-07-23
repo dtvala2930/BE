@@ -1,10 +1,10 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import puppeteer from 'puppeteer';
+// import puppeteer from 'puppeteer';
 import { PrismaService } from '../../prisma.service';
 import { compact, split } from 'lodash';
 import { IAddSearchDetailPayload, IAddSearchPayload } from './utils/interface';
-// import puppeteer from 'puppeteer-core';
-// import { SBR_WS_ENDPOINT } from '../../configs/app.config';
+import puppeteer from 'puppeteer-core';
+import { SBR_WS_ENDPOINT } from '../../configs/app.config';
 
 @Injectable()
 export class SearchService {
@@ -48,17 +48,17 @@ export class SearchService {
   }
 
   async getDataFromScraping(searchKeyword: string) {
-    const browser = await puppeteer.launch({
-      headless: false,
+    // const browser = await puppeteer.launch({
+    //   headless: false,
+    // });
+
+    const browser = await puppeteer.connect({
+      browserWSEndpoint: SBR_WS_ENDPOINT,
     });
 
     const page = await browser.newPage();
 
     try {
-      // const browser = await puppeteer.connect({
-      //   browserWSEndpoint: SBR_WS_ENDPOINT,
-      // });
-
       await page.goto(`https://www.google.com/search?q=${searchKeyword}`);
 
       const pageHTML = await page.content();
