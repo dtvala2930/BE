@@ -6,7 +6,7 @@ export const THROTTLE_LIMIT = 30;
 export const SALT_ROUNDS = 10;
 
 export const PAGINATION = {
-  LIMIT: 10,
+  LIMIT: 2,
   PAGE_DEFAULT: 1,
 };
 

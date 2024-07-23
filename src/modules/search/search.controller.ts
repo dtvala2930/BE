@@ -17,7 +17,7 @@ import { Response } from 'express';
 import { API_PREFIX_PATH } from '../../utils/constant';
 import { ResponseSuccessInterface } from '../../utils/interfaces';
 
-import { assign, compact, omit, split } from 'lodash';
+import { assign, omit } from 'lodash';
 import { ServiceGuard } from '../auth/guards';
 import { AuthGuard } from '@nestjs/passport';
 import { SearchService } from './search.service';
@@ -79,54 +79,32 @@ export class SearchController {
     const dateNowTimeZone = new Date();
     const { user: userCurrent } = req;
 
-    const dataFromUploadedFile = this.searchService.getDataFromFile(
-      payload.fileBase64,
+    const keywords = this.searchService.getKeyWords(payload.fileBase64);
+
+    const resultsScrapped = await this.searchService.getScrappedData(keywords);
+
+    const payloadAddSearch: IAddSearchPayload = {
+      createdAt: dateNowTimeZone,
+      updatedAt: dateNowTimeZone,
+      userId: userCurrent.id,
+      fileId: payload.id,
+      ...omit(payload, ['id', 'fileBase64']),
+    };
+
+    const payloadAddSearchDetail: IAddSearchDetailPayload[] = [];
+
+    for (const item of resultsScrapped) {
+      payloadAddSearchDetail.push({
+        userId: userCurrent.id,
+        fileId: payload.id,
+        result: JSON.stringify(item),
+      });
+    }
+
+    await this.searchService.uploadSearchListAndDetail(
+      payloadAddSearch,
+      payloadAddSearchDetail,
     );
-
-    console.log(dataFromUploadedFile);
-
-    // const scrappingPromises = dataFromUploadedFile.map((item) =>
-    //   this.searchService.getDataFromScraping(item),
-    // );
-
-    // const scrappedData = await Promise.all(scrappingPromises);
-
-    // scrappedData.forEach((item) => {
-    //   resultsScrapped.push(item);
-    // });
-
-    // const payloadAddSearch: IAddSearchPayload = {
-    //   createdAt: dateNowTimeZone,
-    //   updatedAt: dateNowTimeZone,
-    //   userId: userCurrent.id,
-    //   fileId: payload.id,
-    //   ...omit(payload, ['id', 'fileBase64']),
-    // };
-
-    // const payloadAddSearchDetail: IAddSearchDetailPayload = {
-    //   userId: userCurrent.id,
-    //   fileId: payload.id,
-    //   result: JSON.stringify(resultsScrapped),
-    // };
-
-    // try {
-    //   await this.prismaService.$transaction(async (tx) => {
-    //     //insert Table Search
-    //     await tx.search.create({
-    //       data: payloadAddSearch,
-    //     });
-
-    //     // insert Table SearchDetail
-    //     await tx.searchDetail.create({
-    //       data: payloadAddSearchDetail,
-    //     });
-    //   });
-    // } catch (error) {
-    //   return new HttpException(
-    //     'Fail to insert Search',
-    //     HttpStatus.INTERNAL_SERVER_ERROR,
-    //   );
-    // }
 
     return res.status(HttpStatus.OK).json(resData);
   }

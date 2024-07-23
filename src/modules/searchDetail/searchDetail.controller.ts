@@ -5,6 +5,7 @@ import {
   HttpStatus,
   Logger,
   Param,
+  Query,
   Req,
   Res,
   UseGuards,
@@ -22,6 +23,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { RequestHasUserDTO } from '../../utils/request-has-user.dto';
 
 import { SearchDetailService } from './searchDetail.service';
+import { SearchDetailQueryDTO } from './dto/search-detail-request.dto';
 
 @UseGuards(AuthGuard('jwt'), ServiceGuard)
 @Controller(`${API_PREFIX_PATH}/search`)
@@ -35,6 +37,7 @@ export class SearchDetailController {
     @Req() req: RequestHasUserDTO & Request,
     @Res() res: Response,
     @Param('fileId') fileId: string,
+    @Query() queryDTO: SearchDetailQueryDTO,
   ) {
     const resData: ResponseSuccessInterface = {
       statusCode: HttpStatus.OK,
@@ -45,12 +48,14 @@ export class SearchDetailController {
     const { user: userCurrent } = req;
 
     try {
-      const searchData = await this.searchDetailService.getOne(
+      const { data, metaData } = await this.searchDetailService.getDetail(
         userCurrent.id,
         fileId,
+        queryDTO,
       );
       assign(resData, {
-        data: searchData,
+        data: data,
+        metaData,
       });
     } catch (error) {
       this.logger.log(error);
