@@ -17,7 +17,7 @@ import { Response } from 'express';
 import { API_PREFIX_PATH } from '../../utils/constant';
 import { ResponseSuccessInterface } from '../../utils/interfaces';
 
-import { assign, compact, omit, split } from 'lodash';
+import { assign, omit } from 'lodash';
 import { ServiceGuard } from '../auth/guards';
 import { AuthGuard } from '@nestjs/passport';
 import { SearchService } from './search.service';
@@ -70,24 +70,18 @@ export class SearchController {
     @Req() req: RequestHasUserDTO & Request,
     @Body() payload: UploadFileDto,
   ) {
+    const resData: ResponseSuccessInterface = {
+      statusCode: HttpStatus.OK,
+      success: 'search-upload-file-success',
+      data: null,
+    };
+
     const dateNowTimeZone = new Date();
     const { user: userCurrent } = req;
 
-    const data = compact(
-      split(Buffer.from(payload.fileBase64, 'base64').toString(), /\r?\n/),
-    );
+    const keywords = this.searchService.getKeyWords(payload.fileBase64);
 
-    const resultsScrapped = [];
-
-    const scrappingPromises = data.map((item) =>
-      this.searchService.getDataFromScraping(item),
-    );
-
-    const scrappedData = await Promise.all(scrappingPromises);
-
-    scrappedData.forEach((item) => {
-      resultsScrapped.push(item);
-    });
+    const resultsScrapped = await this.searchService.getScrappedData(keywords);
 
     const payloadAddSearch: IAddSearchPayload = {
       createdAt: dateNowTimeZone,
@@ -97,36 +91,20 @@ export class SearchController {
       ...omit(payload, ['id', 'fileBase64']),
     };
 
-    const payloadAddSearchDetail: IAddSearchDetailPayload = {
-      userId: userCurrent.id,
-      fileId: payload.id,
-      result: JSON.stringify(resultsScrapped),
-    };
+    const payloadAddSearchDetail: IAddSearchDetailPayload[] = [];
 
-    try {
-      await this.prismaService.$transaction(async (tx) => {
-        //insert Table Search
-        await tx.search.create({
-          data: payloadAddSearch,
-        });
-
-        // insert Table SearchDetail
-        await tx.searchDetail.create({
-          data: payloadAddSearchDetail,
-        });
+    for (const item of resultsScrapped) {
+      payloadAddSearchDetail.push({
+        userId: userCurrent.id,
+        fileId: payload.id,
+        result: JSON.stringify(item),
       });
-    } catch (error) {
-      return new HttpException(
-        'Fail to insert Search',
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
     }
 
-    const resData: ResponseSuccessInterface = {
-      statusCode: HttpStatus.OK,
-      success: 'search-upload-file-success',
-      data: data,
-    };
+    await this.searchService.uploadSearchListAndDetail(
+      payloadAddSearch,
+      payloadAddSearchDetail,
+    );
 
     return res.status(HttpStatus.OK).json(resData);
   }
